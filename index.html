@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoForge Minecraft Java Wiki & Reference</title>
+    <style>
+        :root {
+            --bg-color: #121813;
+            --panel-bg: #1e2619;
+            --panel-border: #33422a;
+            --mc-green: #58cc02;
+            --mc-green-shadow: #46a302;
+            --mc-blue: #1cb0f6;
+            --mc-blue-shadow: #1899d6;
+            --mc-purple: #ce82ff;
+            --mc-purple-shadow: #a559d6;
+            --mc-orange: #ff9600;
+            --mc-orange-shadow: #cc7800;
+            --mc-red: #ff4b4b;
+            --mc-red-shadow: #ea2b2b;
+            --btn-bg: #2b2b2b;
+            --btn-border: #444444;
+            --btn-bottom-shadow: #181818;
+            --text-main: #f0f6fc;
+            --text-muted: #9db28f;
+            --code-bg: #0b1008;
+            --font-mono: 'Fira Code', 'Courier New', Courier, monospace;
+            --font-sans: 'DIN Round', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#222c1d 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 4px 0 #000;
+            letter-spacing: -0.5px;
+        }
+
+        h1 span {
+            color: var(--mc-green);
+        }
+
+        .mascot-container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .mascot-box {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .mascot-box.right {
+            flex-direction: row-reverse;
+        }
+
+        .mascot-img {
+            width: 90px;
+            height: 120px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 4px 0 rgba(0,0,0,0.6));
+            transition: transform 0.1s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .mascot-box:hover .mascot-img {
+            transform: translateY(-4px);
+        }
+
+        .chat-bubble {
+            background: var(--panel-bg);
+            border: 4px solid var(--panel-border);
+            border-radius: 0px;
+            padding: 14px 18px;
+            position: relative;
+            box-shadow: 0 6px 0 #000;
+            flex: 1;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chat-bubble p {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #e2f0d6;
+            line-height: 1.35;
+        }
+
+        .chat-bubble .speaker {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .villager-talk .speaker { color: var(--mc-orange); }
+        .creeper-talk .speaker { color: var(--mc-green); }
+
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+        }
+
+        .mascot-box.left .chat-bubble::after {
+            left: -20px;
+            border-right-color: var(--panel-border);
+        }
+
+        .mascot-box.right .chat-bubble::after {
+            right: -20px;
+            border-left-color: var(--panel-border);
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            border-radius: 0px;
+            border: 4px solid var(--panel-border);
+            background: var(--panel-bg);
+            color: #fff;
+            outline: none;
+            box-shadow: 0 6px 0 #000;
+            transition: all 0.1s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--mc-green);
+            box-shadow: 0 6px 0 var(--mc-green-shadow);
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .duo-btn {
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: var(--btn-bg);
+            color: #ffffff;
+            border: 2px solid var(--btn-border);
+            box-shadow: 0 4px 0 var(--btn-bottom-shadow);
+            transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .duo-btn:hover {
+            background-color: var(--mc-green);
+            border-color: #6ee610;
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--mc-green-shadow);
+        }
+
+        .duo-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 var(--mc-green-shadow);
+        }
+
+        .duo-btn.active {
+            background-color: var(--mc-green);
+            color: #fff;
+            border-color: #6ee610;
+            box-shadow: 0 4px 0 var(--mc-green-shadow);
+        }
+
+        .video-section {
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            background: var(--panel-bg);
+            border: 4px solid var(--panel-border);
+            padding: 20px;
+            box-shadow: 0 6px 0 #000;
+        }
+
+        .video-section h2 {
+            font-size: 1.3rem;
+            color: var(--mc-orange);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .main-video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border: 3px solid var(--panel-border);
+        }
+
+        .main-video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .grid-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .token-card {
+            background-color: var(--panel-bg);
+            border: 4px solid var(--panel-border);
+            border-radius: 0px;
+            padding: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #000;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .token-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--mc-blue);
+            box-shadow: 0 8px 0 var(--mc-blue-shadow);
+        }
+
+        .token-card:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 var(--mc-blue-shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .token-symbol {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--mc-green);
+            background: rgba(88, 204, 2, 0.15);
+            padding: 4px 8px;
+            border-radius: 0px;
+            border: 2px solid rgba(88, 204, 2, 0.3);
+        }
+
+        .token-badge {
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 0px;
+            color: #fff;
+            background: var(--mc-purple);
+            box-shadow: 0 3px 0 var(--mc-purple-shadow);
+        }
+
+        .token-badge.guides { background: var(--mc-orange); box-shadow: 0 3px 0 var(--mc-orange-shadow); }
+
+        .token-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            font-weight: 700;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 4px solid var(--panel-border);
+            border-radius: 0px;
+            width: 100%;
+            max-width: 850px;
+            padding: 28px;
+            box-shadow: 0 10px 0 #000;
+            transform: scale(0.95);
+            transition: transform 0.15s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-speaker-container {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: -4px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .modal-speaker-container.align-right {
+            justify-content: flex-end;
+        }
+
+        .modal-mascot-img {
+            width: 128px;
+            height: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 4px 0 rgba(0,0,0,0.6));
+        }
+
+        .pixel-bubble-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .pixel-bubble {
+            background-color: #ffffff;
+            border: 4px solid #000000;
+            border-radius: 0px;
+            padding: 16px 20px;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .pixel-bubble p {
+            color: #000000 !important;
+            font-weight: 800;
+            font-size: 1.05rem;
+            line-height: 1.45;
+        }
+
+        .pixel-bubble::before, .pixel-bubble::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .pixel-bubble.speaker-villager::before {
+            top: -20px;
+            left: 36px;
+            border-width: 0 12px 16px 12px;
+            border-color: transparent transparent #000000 transparent;
+        }
+        .pixel-bubble.speaker-villager::after {
+            top: -13px;
+            left: 40px;
+            border-width: 0 8px 12px 8px;
+            border-color: transparent transparent #ffffff transparent;
+        }
+
+        .pixel-bubble.speaker-creeper::before {
+            top: -20px;
+            right: 36px;
+            border-width: 0 12px 16px 12px;
+            border-color: transparent transparent #000000 transparent;
+        }
+        .pixel-bubble.speaker-creeper::after {
+            top: -13px;
+            right: 40px;
+            border-width: 0 8px 12px 8px;
+            border-color: transparent transparent #ffffff transparent;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--panel-border);
+            padding-bottom: 12px;
+        }
+
+        .modal-title {
+            font-family: var(--font-mono);
+            font-size: 1.7rem;
+            color: var(--mc-green);
+            font-weight: 900;
+        }
+
+        .close-btn {
+            background: var(--mc-red);
+            box-shadow: 0 5px 0 var(--mc-red-shadow);
+            color: white;
+            border: 2px solid #b31d1d;
+            border-radius: 0px;
+            padding: 8px 16px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .close-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        .modal-body h4 {
+            color: var(--mc-blue);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin: 18px 0 6px 0;
+            font-weight: 900;
+        }
+
+        .modal-body p {
+            font-size: 0.98rem;
+            color: var(--text-main);
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .properties-container-custom {
+            margin-top: 10px;
+            background: var(--code-bg);
+            border: 3px solid var(--panel-border);
+            padding: 16px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .properties-container-custom h5 {
+            color: var(--mc-orange);
+            font-size: 1rem;
+            font-weight: 800;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            border-bottom: 1px dashed var(--panel-border);
+            padding-bottom: 4px;
+        }
+
+        .properties-container-custom h5:first-child {
+            margin-top: 0;
+        }
+
+        .properties-container-custom ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .properties-container-custom li {
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .properties-container-custom code {
+            color: var(--mc-green);
+            background: rgba(88, 204, 2, 0.1);
+            padding: 2px 5px;
+            border-radius: 2px;
+        }
+
+        .properties-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: var(--code-bg);
+            border: 3px solid var(--panel-border);
+        }
+
+        .properties-table th, .properties-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--panel-border);
+            font-size: 0.9rem;
+        }
+
+        .properties-table th {
+            color: var(--mc-orange);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .properties-table td:first-child {
+            font-family: var(--font-mono);
+            color: var(--mc-green);
+            font-weight: 700;
+            width: 35%;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 3px solid var(--panel-border);
+            border-radius: 0px;
+            padding: 14px;
+            margin-top: 8px;
+            overflow-x: auto;
+            box-shadow: 0 4px 0 #000;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            color: #e6edf3;
+            font-size: 0.88rem;
+            white-space: pre;
+        }
+
+        .kw { color: #ff7b72; font-weight: bold; }
+        .str { color: #a5d6ff; }
+        .cmnt { color: #6e7681; font-style: italic; }
+        .anno { color: #d2a8ff; font-weight: bold; }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        @media (max-width: 768px) {
+            .mascot-container { flex-direction: column; align-items: center; }
+            .mascot-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>NEOFORGE <span>JAVA REFERENCE</span></h1>
+    </header>
+
+    <div class="mascot-container">
+        <div class="mascot-box left" id="villagerBox">
+            <img id="villagerImg" class="mascot-img" alt="Villager">
+            <div class="chat-bubble villager-talk">
+                <div class="speaker">Villager Builder</div>
+                <p id="villagerText">Hrrr! Click any card below to learn how to create blocks, items, mobs, and projectiles!</p>
+            </div>
+        </div>
+        <div class="mascot-box right" id="creeperBox">
+            <img id="creeperImg" class="mascot-img" alt="Creeper">
+            <div class="chat-bubble creeper-talk">
+                <div class="speaker">Creeper Coder</div>
+                <p id="creeperText">Sssss... Every time you click a topic, one of us will randomly explain how it works!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="search-bar-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search NeoForge topics (e.g. 'block', 'mob', 'projectile', 'properties', 'sword')...">
+        </div>
+        <div class="category-filters" id="categoryFilters">
+            <button class="duo-btn active" data-category="ALL">All</button>
+            <button class="duo-btn" data-category="ITEMS">Items & Tools</button>
+            <button class="duo-btn" data-category="BLOCKS">Blocks</button>
+            <button class="duo-btn" data-category="ARMOR & WEAPONS">Armor & Weapons</button>
+            <button class="duo-btn" data-category="MOBS">Mobs & Entities</button>
+            <button class="duo-btn" data-category="PROJECTILES">Projectiles</button>
+        </div>
+    </div>
+
+    <main class="grid-container" id="gridContainer"></main>
+
+    <!-- Video section placed below the tokens -->
+    <section class="video-section">
+        <h2>Featured Java Video Tutorial</h2>
+        <div class="main-video-wrapper">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/xk4_1vDrzzo?si=5pTsRuIn_FunvGQV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-speaker-container" id="modalSpeakerContainer">
+                <img id="modalMascotImg" class="modal-mascot-img" alt="Mascot">
+            </div>
+
+            <div class="pixel-bubble-container">
+                <div class="pixel-bubble speaker-villager" id="pixelBubble">
+                    <p id="modalExplanationText">-</p>
+                </div>
+            </div>
+
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">title</div>
+                <button class="close-btn" id="closeBtn">Close</button>
+            </div>
+
+            <div class="modal-body">
+                <h4>Category</h4>
+                <p id="modalCategory">-</p>
+
+                <h4>Detailed Explanation</h4>
+                <p id="modalDetailedExplanation">-</p>
+
+                <h4>Minecraft Engine Properties</h4>
+                <div id="modalPropertiesContainer"></div>
+                
+                <h4>NeoForge Code Example</h4>
+                <pre><code id="modalCode"></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const VILLAGER_PALETTE = {
+            1: "#281808", 2: "#d09040", 3: "#c88030", 4: "#b87830", 5: "#986020",
+            6: "#583818", 7: "#281810", 8: "#805038", 9: "#785038", 10: "#180808",
+            11: "#382018", 12: "#905848", 13: "#a86848", 14: "#302018", 15: "#100808",
+            16: "#785040", 17: "#b87858", 18: "#905840", 19: "#986048", 20: "#281818",
+            21: "#f0f0f0", 22: "#388020", 23: "#306020", 24: "#e0e0e0", 25: "#60a848",
+            26: "#205818", 27: "#805040", 28: "#381008", 29: "#402820", 30: "#401008",
+            31: "#181010", 32: "#503028", 33: "#483028", 34: "#482820", 35: "#181008",
+            36: "#201010", 37: "#201810", 38: "#583830", 39: "#603830", 40: "#503828",
+            41: "#684038", 42: "#604030"
+        };
+
+        const CREEPER_PALETTE = {
+            1: "#102810", 2: "#30a030", 3: "#309830", 4: "#207820", 5: "#209020",
+            6: "#082008", 7: "#186818", 8: "#187818", 9: "#188018", 10: "#309030",
+            11: "#087008", 12: "#182818", 13: "#202820", 14: "#087808", 15: "#208820",
+            16: "#081808", 17: "#101810", 18: "#88d088", 19: "#106010", 20: "#106810",
+            21: "#086008", 22: "#182018", 23: "#085008", 24: "#085808", 25: "#105810",
+            26: "#105010", 27: "#080808", 28: "#184818", 29: "#081008", 30: "#107010"
+        };
+
+        const VILLAGER_PIXELS = [
+            [0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,1,2,3,4,1,3,4,2,2,5,4,6,5,4,1,1,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,1,1,5,2,3,1,5,2,3,4,2,3,3,2,4,1,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,1,0,0,1,3,4,4,1,2,3,4,4,2,5,4,4,2,1,0,0,1,0,0,0,0,0,0,0],
+            [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,7,8,1,8,7,9,9,9,9,10,10,10,10,10,7,1,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,12,12,13,14,15,15,15,15,16,16,16,16,16,7,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,17,13,11,18,18,18,18,13,13,19,19,19,20,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,17,13,11,17,17,17,13,13,19,19,19,19,14,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,17,13,11,21,22,23,13,19,19,21,22,23,14,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,17,13,11,24,25,26,13,19,19,24,25,26,14,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,17,13,11,18,18,18,19,19,19,27,27,27,14,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,13,19,11,13,28,28,29,29,29,19,19,19,14,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,17,13,19,11,13,28,30,29,17,19,11,28,19,20,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,13,19,19,14,13,19,30,29,17,19,11,30,19,7,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,11,14,14,20,20,20,20,20,29,17,19,11,7,7,7,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,31,32,32,33,29,31,32,29,19,19,11,34,29,35,36,37,37,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,37,37,37,37,33,37,38,38,11,11,11,32,33,36,39,40,29,37,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,7,39,41,41,39,7,7,41,41,38,38,38,38,40,37,39,39,40,29,37,0,0,0,0,0],
+            [0,0,0,0,0,0,0,7,39,41,41,41,39,7,41,41,41,41,42,38,40,37,39,39,39,40,29,37,0,0,0,0],
+            [0,0,0,0,0,0,0,7,39,41,41,41,41,39,7,41,41,42,38,40,40,37,36,39,39,40,40,37,0,0,0,0],
+            [0,0,0,0,0,0,0,37,39,39,41,41,41,41,39,7,7,7,7,7,37,37,37,37,39,39,40,29,37,0,0,0],
+            [0,0,0,0,0,0,0,37,40,40,39,41,41,41,41,41,41,41,41,41,41,41,41,41,39,39,40,29,37,0,0,0],
+            [0,0,0,0,0,0,0,0,37,29,40,39,39,39,39,39,39,39,39,39,39,39,39,39,39,39,40,29,37,0,0,0],
+            [0,0,0,0,0,0,0,0,31,37,29,40,40,40,40,40,40,40,40,40,40,40,40,40,40,40,29,29,37,0,0,0],
+            [0,0,0,0,0,0,0,0,36,41,37,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,37,0,0,0],
+            [0,0,0,0,0,0,0,0,37,41,39,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,37,0,0,0,0],
+            [0,0,0,0,0,0,0,0,37,41,39,40,29,31,41,41,42,39,40,40,29,31,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,7,39,39,40,29,36,39,39,39,40,40,29,29,36,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,7,39,40,29,29,37,40,40,40,40,29,29,29,37,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,7,40,29,29,29,7,29,29,29,29,29,29,29,37,0,0,0,0,0,0,0,0,0,0]
+        ];
+
+        const CREEPER_PIXELS = [
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,1,2,3,3,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,0,1,4,4,5,5,3,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,6,7,8,8,7,9,4,4,10,3,3,1,1,1,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,0,6,11,12,13,11,14,8,8,5,4,15,1,10,10,1,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,16,11,17,18,13,11,12,13,8,19,4,1,4,4,10,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,16,14,11,17,17,12,11,17,18,13,20,6,20,20,4,10,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,16,14,14,11,11,11,11,17,17,12,21,6,21,21,20,4,1,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,16,21,21,22,22,22,14,11,11,21,21,16,21,21,21,6,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,23,17,22,17,17,22,22,11,21,21,16,21,21,21,21,6,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,23,17,17,17,17,17,22,23,23,21,16,21,21,21,21,16,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,24,17,17,21,21,17,17,17,23,16,24,21,21,21,16,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,25,25,24,24,24,17,17,17,21,16,25,24,24,24,16,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,16,16,25,25,25,24,24,24,16,26,25,25,25,25,16,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,27,26,16,16,16,25,25,25,16,28,26,26,26,16,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,27,19,26,26,26,16,16,16,16,28,28,28,28,16,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,29,30,19,19,19,26,27,26,26,16,16,16,16,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,29,14,14,30,20,24,27,25,25,25,26,26,26,27,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,14,14,14,11,21,29,24,24,24,25,25,25,27,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,14,14,11,21,21,29,21,21,21,24,24,24,29,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,16,14,14,14,11,21,16,21,21,21,21,21,21,29,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,16,14,14,14,11,21,16,21,21,21,21,21,21,16,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,16,14,14,14,11,21,16,21,21,21,21,21,21,16,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,14,14,11,21,21,16,21,21,21,21,21,21,16,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,16,14,14,14,11,21,16,21,21,21,21,21,21,16,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,29,14,14,14,11,21,29,21,21,21,21,21,21,29,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,29,14,14,14,11,21,29,21,21,21,21,21,21,29,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,29,20,20,20,20,24,29,24,24,24,24,24,24,29,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0,27,25,25,25,25,25,27,25,25,25,25,25,25,27,0,0,0,0,0,0,0,0,0]
+        ];
+
+        function generateSvgFromGrid(pixelGrid, palette) {
+            if (!pixelGrid || pixelGrid.length === 0) return "";
+            const height = pixelGrid.length;
+            const width = pixelGrid[0].length;
+            let rects = "";
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const colorKey = pixelGrid[y][x];
+                    if (colorKey !== 0 && palette[colorKey]) {
+                        const hexColor = palette[colorKey].replace("#", "%23");
+                        rects += `<rect x="${x}" y="${y}" width="1.05" height="1.05" fill="${hexColor}"/>`;
+                    }
+                }
+            }
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width * 4}" height="${height * 4}"><rect width="${width}" height="${height}" fill="none"/>${rects}</svg>`;
+        }
+
+        const VILLAGER_SVG = generateSvgFromGrid(VILLAGER_PIXELS, VILLAGER_PALETTE);
+        const CREEPER_SVG = generateSvgFromGrid(CREEPER_PIXELS, CREEPER_PALETTE);
+
+        document.getElementById('villagerImg').src = VILLAGER_SVG;
+        document.getElementById('creeperImg').src = CREEPER_SVG;
+
+        const customBlockPropertiesHtml = `
+            <div class="properties-container-custom">
+                <h5>Durability & Mining</h5>
+                <ul>
+                    <li><code>destroyTime(float hardness)</code> (or strength): Sets the time required to mine the block (e.g., Stone is 1.5F, Obsidian is 50.0F, Bedrock is -1.0F).</li>
+                    <li><code>explosionResistance(float resistance)</code>: Determines how well the block withstands TNT, Creeper, and Wither blasts.</li>
+                    <li><code>strength(float hardness, float resistance)</code>: A shorthand wrapper method that sets both mining hardness and explosion resistance at once.</li>
+                    <li><code>requiresCorrectToolForDrops()</code>: Prevents the block from dropping items unless mined with the valid assigned tool tier (e.g., Diamond Pickaxe).</li>
+                    <li><code>instantly()</code> (or breakInstantly): Causes the block to break immediately in 1 hit by hands or any tool (like Torches, Crops, and TNT).</li>
+                    <li><code>noLootTable()</code> (or noDrops): Forces the block to never drop items when broken, completely ignoring standard loot tables (like Glass).</li>
+                    <li><code>dropsLike(Block block)</code>: Directs the block to mirror the exact loot table drops of a pre-existing vanilla block.</li>
+                </ul>
+
+                <h5>Visuals & Lighting</h5>
+                <ul>
+                    <li><code>lightLevel(ToIntFunction&lt;BlockState&gt; stateFunction)</code>: Emits a set level of light from the block, accepting values from 0 up to a blinding brightness of 15.</li>
+                    <li><code>noOcclusion()</code>: Tells the rendering engine that the block is translucent or has gaps (like Glass or Leaves), preventing world culling behind it.</li>
+                    <li><code>hasPostProcess(BlockBehaviour.StatePredicate predicate)</code>: Forces the game engine to run secondary lighting calculations on the texture model even in pure darkness (like Magma).</li>
+                    <li><code>isViewBlocking(BlockBehaviour.StatePredicate predicate)</code>: Determines whether a mob's AI line-of-sight can see through this block.</li>
+                    <li><code>isSuffocating(BlockBehaviour.StatePredicate predicate)</code>: Defines whether an entity will actively choke and take suffocation damage if their head is stuck inside this block.</li>
+                    <li><code>isRedstoneConductor(BlockBehaviour.StatePredicate predicate)</code>: Sets whether redstone current can pass through this solid block to power elements on the other side.</li>
+                    <li><code>solid()</code>: Declares the block as a structurally solid material type for standard rendering and raycasting logic.</li>
+                    <li><code>air()</code>: Flags the block properties as an open atmospheric air block.</li>
+                </ul>
+
+                <h5>Physics & Entity Interaction</h5>
+                <ul>
+                    <li><code>noCollission()</code>: Removes the physical bounding box entirely, allowing entities to pass straight through it (like Tall Grass or Water).</li>
+                    <li><code>speedFactor(float factor)</code>: Modifies entity walking movement speed across the top surface (Standard is 1.0F, Soul Sand is 0.4F).</li>
+                    <li><code>jumpFactor(float factor)</code>: Alters jump height momentum executed off this block (Standard is 1.0F, Honey blocks use 0.5F).</li>
+                    <li><code>friction(float slipperiness)</code>: Sets physical slipping momentum over the surface (Standard is 0.6F, Ice surfaces use 0.98F).</li>
+                    <li><code>forceSolidOn() / forceSolidOff()</code>: Overrides default material rendering bounds to hard-toggle entity block collision logic on or off.</li>
+                </ul>
+
+                <h5>Game Loop & World Logic</h5>
+                <ul>
+                    <li><code>randomTicks()</code>: Forces the tick engine to feed random update ticks to this block (mandatory for growing crops, spreading fire, or melting ice).</li>
+                    <li><code>replaceable()</code>: Allows players to instantly overwrite this block by clicking on it with another block item in hand (like Snow layers).</li>
+                    <li><code>pushReaction(PushReaction reaction)</code>: Defines Piston behaviors (NORMAL, DESTROY like torches, BLOCK like obsidian, or PUSH_ONLY like glaze).</li>
+                    <li><code>liquid()</code>: Registers the physics engine to calculate and handle this custom block structure natively as a fluid body.</li>
+                    <li><code>sound(SoundType type)</code>: Links distinct step, break, place, hit, and fall audio effects (e.g., SoundType.STONE, SoundType.WOOD).</li>
+                    <li><code>mapColor(MapColor color)</code> (or function wrapper): Sets the custom exact color pixel layout used to display this block on paper map items.</li>
+                    <li><code>ignitedByLava()</code>: Allows lava proximity paths to catch this block on fire automatically.</li>
+                    <li><code>instrument(NoteBlockInstrument instrument)</code>: Assigns a specific instrument sound profile when placed directly underneath a note block.</li>
+                </ul>
+
+                <h5>Helper Copy Constructors</h5>
+                <ul>
+                    <li><code>of()</code>: Creates a blank property canvas to start building a block from scratch.</li>
+                    <li><code>ofFullCopy(Block vanillaBlock)</code>: Clones every property value—hardness, sounds, light, and parameters—directly from an existing vanilla block.</li>
+                </ul>
+            </div>
+        `;
+
+        const neoforgeDatabase = [
+            {
+                symbol: "Basic Block",
+                category: "BLOCKS",
+                desc: "Registering a custom block with hardness, resistance, and sound properties.",
+                explanation: "Blocks in NeoForge represent solid physical world structures. They rely on BlockBehaviour.Properties to control physical interaction like breaking time, blast resistance, and required mining tools.",
+                detailedExplanation: "When registering a block, you define its physical attributes via Java parameters. Hardness controls how long it takes to break with a tool, blast resistance determines survival against TNT or Creeper explosions, and sound properties dictate footsteps and mining noises.",
+                customProperties: true,
+                example: `<span class="kw">public static final</span> DeferredBlock&lt;Block&gt; RUBY_BLOCK = BLOCKS.registerBlock(<span class="str">"ruby_block"</span>,\n    properties -> <span class="kw">new</span> Block(properties),\n    BlockBehaviour.Properties.of()\n        .mapColor(MapColor.COLOR_RED)\n        .strength(<span class="kw">5.0f</span>, <span class="kw">6.0f</span>)\n        .sound(SoundType.METAL)\n        .requiresCorrectToolForDrops()\n);`
+            },
+            {
+                symbol: "Glowing Block",
+                category: "BLOCKS",
+                desc: "Modifying block properties to emit custom light levels.",
+                explanation: "Light-emitting blocks pass a light level lambda function inside BlockBehaviour.Properties to project light values into surrounding chunks.",
+                detailedExplanation: "The .lightLevel() method accepts a function taking a BlockState parameter and returning an integer from 0 (completely dark) to 15 (brightest possible light level, identical to Glowstone or Sea Lanterns).",
+                customProperties: true,
+                example: `<span class="kw">public static final</span> DeferredBlock&lt;Block&gt; GLOW_ORE = BLOCKS.registerBlock(<span class="str">"glow_ore"</span>,\n    properties -> <span class="kw">new</span> Block(properties),\n    BlockBehaviour.Properties.of()\n        .strength(<span class="kw">3.0f</span>)\n        .lightLevel(state -> <span class="kw">15</span>)\n);`
+            },
+            {
+                symbol: "Interactive Block",
+                category: "BLOCKS",
+                desc: "A custom block class overriding useWithoutItem for right-click events.",
+                explanation: "By extending the Block class and overriding useWithoutItem, blocks can execute server-side code when a player right-clicks them.",
+                detailedExplanation: "Overriding interaction methods lets you create interactive blocks like custom crafting tables, switches, or decorative mechanisms that toggle states or display particles on right-click.",
+                customProperties: true,
+                example: `<span class="kw">public class</span> InteractivePedestalBlock <span class="kw">extends</span> Block {\n    <span class="kw">public</span> InteractivePedestalBlock(Properties props) { <span class="kw">super</span>(props); }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected</span> InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {\n        <span class="kw">if</span> (!level.isClientSide()) {\n            player.sendSystemMessage(Component.literal(<span class="str">"You activated the Pedestal!"</span>));\n        }\n        <span class="kw">return</span> InteractionResult.SUCCESS;\n    }\n}`
+            },
+            {
+                symbol: "Basic Item",
+                category: "ITEMS",
+                desc: "Registering standard crafting items with DeferredRegister.",
+                explanation: "Simple items exist as inventory components used in crafting recipes, furnace smelting, or trade transactions.",
+                detailedExplanation: "Registered with standard Item.Properties(), basic items handle stack sizes (default 64, or reduced to 16/1 for special items) and fireproof status in nether lava.",
+                properties: [
+                    { name: "Texture Path", value: "assets/modid/textures/item/ruby.png" },
+                    { name: "Max Stack Size", value: "64 Items" },
+                    { name: "Rarity", value: "Common (White Name)" },
+                    { name: "Fire Resistant", value: "No" },
+                    { name: "Right-Click Action", value: "None" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);\n\n<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY = ITEMS.registerSimpleItem(<span class="str">"ruby"</span>, <span class="kw">new</span> Item.Properties());`
+            },
+            {
+                symbol: "Right-Click Utility Wand",
+                category: "ITEMS",
+                desc: "An item that triggers custom code and cooldowns when right-clicked.",
+                explanation: "Custom items override the use() method to execute logic on right-click, applying cooldowns to prevent spam.",
+                detailedExplanation: "When right-clicked in hand, the server checks cooldown state. If ready, it executes logic like healing, spawning particles, or casting magic, then registers a tick cooldown.",
+                properties: [
+                    { name: "Texture Path", value: "assets/modid/textures/item/healing_wand.png" },
+                    { name: "Max Stack Size", value: "1 Item (Non-stackable)" },
+                    { name: "Cooldown", value: "2.0 Seconds (40 Ticks)" },
+                    { name: "Right-Click Action", value: "Restores 3 Hearts (6.0 Health points) to the user" }
+                ],
+                example: `<span class="kw">public class</span> HealingWandItem <span class="kw">extends</span> Item {\n    <span class="kw">public</span> HealingWandItem(Properties props) { <span class="kw">super</span>(props); }\n\n    <span class="anno">@Override</span>\n    <span class="kw">public</span> InteractionResultHolder&lt;ItemStack&gt; use(Level level, Player player, InteractionHand hand) {\n        <span class="kw">if</span> (!level.isClientSide()) {\n            player.heal(<span class="kw">6.0f</span>);\n            player.getCooldowns().addCooldown(<span class="kw">this</span>, <span class="kw">40</span>);\n        }\n        <span class="kw">return</span> InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());\n    }\n}`
+            },
+            {
+                symbol: "Custom Sword",
+                category: "ARMOR & WEAPONS",
+                desc: "Creating melee weapons with custom attack damage and swing speed.",
+                explanation: "Weapons extend SwordItem and configure damage and attack speed through AttributeModifiers.",
+                detailedExplanation: "Sword damage calculates as Base Hand Damage (1) + Tier Base Damage + Custom Modifier. Swing speed determines attack indicator recharge rates.",
+                properties: [
+                    { name: "Texture Path", value: "assets/modid/textures/item/ruby_sword.png" },
+                    { name: "Material Tier", value: "Diamond Equivalent (3.0 Mining Level)" },
+                    { name: "Attack Damage", value: "8.0 Attack Points (4 Hearts)" },
+                    { name: "Attack Speed", value: "1.6 Swings per second (-2.4f modifier)" },
+                    { name: "Durability", value: "1561 Uses" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY_SWORD = ITEMS.register(<span class="str">"ruby_sword"</span>,\n    () -> <span class="kw">new</span> SwordItem(Tiers.DIAMOND, <span class="kw">new</span> Item.Properties().attributes(\n        SwordItem.createAttributes(Tiers.DIAMOND, <span class="kw">4</span>, <span class="kw">-2.4f</span>)\n    )));`
+            },
+            {
+                symbol: "Armor Pieces",
+                category: "ARMOR & WEAPONS",
+                desc: "Registering Helmets, Chestplates, Leggings, and Boots.",
+                explanation: "Armor items use ArmorItem paired with an ArmorMaterial to calculate damage reduction values and knockback resistance.",
+                detailedExplanation: "Each piece defines equipment slots (HEAD, CHEST, LEGS, FEET). Armor points directly reduce incoming physical damage according to standard Minecraft armor formulas.",
+                properties: [
+                    { name: "Texture Path", value: "assets/modid/textures/models/armor/ruby_layer_1.png" },
+                    { name: "Armor Defense Points", value: "+8 Armor Points" },
+                    { name: "Armor Toughness", value: "+2.0 Toughness" },
+                    { name: "Knockback Resistance", value: "0.1 (10% Reduction)" },
+                    { name: "Equipment Slot", value: "Chestplate (ArmorItem.Type.CHESTPLATE)" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY_CHESTPLATE = ITEMS.register(<span class="str">"ruby_chestplate"</span>,\n    () -> <span class="kw">new</span> ArmorItem(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE, <span class="kw">new</span> Item.Properties()));`
+            },
+            {
+                symbol: "Custom Mob Entity",
+                category: "MOBS",
+                desc: "Creating hostile or passive mob entities with AI goals.",
+                explanation: "Mobs extend Monster or PathfinderMob, overriding registerGoals() to build custom AI behavioral trees.",
+                detailedExplanation: "Goal Selectors manage dynamic behavior priorities: priority 1 manages floating/swimming, priority 2 melee combat targeting, and higher priorities control roaming or idle animations.",
+                properties: [
+                    { name: "Entity Model", value: "assets/modid/geo/custom_monster.geo.json" },
+                    { name: "Entity Type", value: "Hostile Monster (MobCategory.MONSTER)" },
+                    { name: "Behavior Goals", value: "Swimming, Melee Attack, Target Players" },
+                    { name: "Hitbox Dimensions", value: "0.6 Width x 1.9 Height" }
+                ],
+                example: `<span class="kw">public class</span> CustomMonster <span class="kw">extends</span> Monster {\n    <span class="kw">public</span> CustomMonster(EntityType&lt;? <span class="kw">extends</span> Monster&gt; type, Level level) {\n        <span class="kw">super</span>(type, level);\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected void</span> registerGoals() {\n        <span class="kw">this</span>.goalSelector.addGoal(<span class="kw">1</span>, <span class="kw">new</span> FloatGoal(<span class="kw">this</span>));\n        <span class="kw">this</span>.goalSelector.addGoal(<span class="kw">2</span>, <span class="kw">new</span> MeleeAttackGoal(<span class="kw">this</span>, <span class="kw">1.2D</span>, <span class="kw">false</span>));\n        <span class="kw">this</span>.targetSelector.addGoal(<span class="kw">1</span>, <span class="kw">new</span> NearestAttackableTargetGoal&lt;&gt;(<span class="kw">this</span>, Player.<span class="kw">class</span>, <span class="kw">true</span>));\n    }\n}`
+            },
+            {
+                symbol: "Mob Attributes",
+                category: "MOBS",
+                desc: "Setting max health, movement speed, and attack damage for mobs.",
+                explanation: "Attributes set base stats like total hit points, movement pace, and hit damage using the EntityAttributeCreationEvent event bus.",
+                detailedExplanation: "Without registered attributes, mob entities will crash upon spawning. MAX_HEALTH determines maximum health points, while ATTACK_DAMAGE sets unarmored melee strike power.",
+                properties: [
+                    { name: "Max Health", value: "40.0 Points (20 Hearts)" },
+                    { name: "Movement Speed", value: "0.25 (Standard Zombie Speed)" },
+                    { name: "Attack Damage", value: "6.0 Points (3 Hearts per hit)" },
+                    { name: "Follow Range", value: "32.0 Blocks" }
+                ],
+                example: `<span class="anno">@SubscribeEvent</span>\n<span class="kw">public static void</span> registerAttributes(EntityAttributeCreationEvent event) {\n    event.put(ModEntities.CUSTOM_MONSTER.get(), Monster.createMonsterAttributes()\n        .add(Attributes.MAX_HEALTH, <span class="kw">40.0D</span>)\n        .add(Attributes.MOVEMENT_SPEED, <span class="kw">0.25D</span>)\n        .add(Attributes.ATTACK_DAMAGE, <span class="kw">6.0D</span>)\n        .build());\n}`
+            },
+            {
+                symbol: "Throwable Projectile",
+                category: "PROJECTILES",
+                desc: "Creating custom entity projectiles with block and entity collision.",
+                explanation: "Projectiles extend ThrowableItemProjectile to handle velocity, trajectory physics, entity damage, and block impact explosions.",
+                detailedExplanation: "When colliding with entities, onHitEntity() inflicts custom damage. Upon hitting blocks, onHitBlock() triggers server-side explosions or tile modifications before discarding the entity.",
+                properties: [
+                    { name: "Render Item", value: "Items.FIRE_CHARGE" },
+                    { name: "Entity Damage", value: "8.0 Direct Hit Points (4 Hearts)" },
+                    { name: "Block Collision", value: "Creates Explosion (Radius: 2.0, Cause: MOB)" },
+                    { name: "Gravity Influence", value: "Standard Throwable Arc Physics" }
+                ],
+                example: `<span class="kw">public class</span> MagicFireballEntity <span class="kw">extends</span> ThrowableItemProjectile {\n    <span class="kw">public</span> MagicFireballEntity(EntityType&lt;? <span class="kw">extends</span> ThrowableItemProjectile&gt; type, Level level) {\n        <span class="kw">super</span>(type, level);\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected void</span> onHitEntity(EntityHitResult result) {\n        <span class="kw">super</span>.onHitEntity(result);\n        result.getEntity().hurt(<span class="kw">this</span>.damageSources().thrown(<span class="kw">this</span>, <span class="kw">this</span>.getOwner()), <span class="kw">8.0f</span>);\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected void</span> onHitBlock(BlockHitResult result) {\n        <span class="kw">super</span>.onHitBlock(result);\n        <span class="kw">if</span> (!<span class="kw">this</span>.level().isClientSide()) {\n            <span class="kw">this</span>.level().explode(<span class="kw">this</span>, <span class="kw">this</span>.getX(), <span class="kw">this</span>.getY(), <span class="kw">this</span>.getZ(), <span class="kw">2.0f</span>, Level.ExplosionInteraction.MOB);\n            <span class="kw">this</span>.discard();\n        }\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected</span> Item getDefaultItem() { <span class="kw">return</span> Items.FIRE_CHARGE; }\n}`
+            },
+            {
+                symbol: "Spawning Projectiles",
+                category: "PROJECTILES",
+                desc: "Calculating direction and launching projectiles from a player.",
+                explanation: "Launching projectiles involves constructing entity instances server-side and calling shootFromRotation() with velocity and inaccuracy offsets.",
+                detailedExplanation: "To prevent visual desync, projectile instantiation occurs purely on the server side (!level.isClientSide()). Velocity vectors are calculated directly from player pitch and yaw angles.",
+                properties: [
+                    { name: "Spawn Position", value: "Player Eye Level (eyeY - 0.1)" },
+                    { name: "Velocity Factor", value: "1.5 (Initial Flight Speed)" },
+                    { name: "Inaccuracy Multiplier", value: "1.0 (Standard Arc Spread)" },
+                    { name: "Side Constraint", value: "Server-Side Only Execution" }
+                ],
+                example: `<span class="kw">if</span> (!level.isClientSide()) {\n    MagicFireballEntity spell = <span class="kw">new</span> MagicFireballEntity(ModEntities.MAGIC_FIREBALL.get(), level);\n    spell.setOwner(player);\n    spell.setPos(player.getX(), player.getEyeY() - <span class="kw">0.1</span>, player.getZ());\n    spell.shootFromRotation(player, player.getXRot(), player.getYRot(), <span class="kw">0.0F</span>, <span class="kw">1.5F</span>, <span class="kw">1.0F</span>);\n    level.addFreshEntity(spell);\n}`
+            }
+        ];
+
+        const villagerReactions = [
+            "Hrrr! Listen closely to the Creeper's explanation!",
+            "Hrrr! What an interesting piece of Java code!",
+            "Hrrr! Write that down in your NeoForge modding notes!",
+            "Hrrr! That is a very useful technique for mod developers!"
+        ];
+
+        const creeperReactions = [
+            "Ssss... The Villager actually explained that really well!",
+            "Ssss... Make sure to copy the code carefully or it will crash!",
+            "Ssss... I won't blow up the Villager while he explains this one!",
+            "Ssss... Read what the Villager said carefully!"
+        ];
+
+        let currentCategory = "ALL";
+        let searchQuery = "";
+
+        const gridContainer = document.getElementById('gridContainer');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilters = document.getElementById('categoryFilters');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalDetailedExplanation = document.getElementById('modalDetailedExplanation');
+        const modalPropertiesContainer = document.getElementById('modalPropertiesContainer');
+        const modalCode = document.getElementById('modalCode');
+        const modalExplanationText = document.getElementById('modalExplanationText');
+        const pixelBubble = document.getElementById('pixelBubble');
+        const modalMascotImg = document.getElementById('modalMascotImg');
+        const modalSpeakerContainer = document.getElementById('modalSpeakerContainer');
+        const closeBtn = document.getElementById('closeBtn');
+        const villagerText = document.getElementById('villagerText');
+        const creeperText = document.getElementById('creeperText');
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function openModal(token) {
+            const isVillager = Math.random() < 0.5;
+
+            modalTitle.textContent = token.symbol;
+            modalCategory.textContent = token.category;
+            modalDetailedExplanation.textContent = token.detailedExplanation;
+            modalCode.innerHTML = token.example;
+
+            if (token.customProperties) {
+                modalPropertiesContainer.innerHTML = customBlockPropertiesHtml;
+            } else if (token.properties && token.properties.length > 0) {
+                let tableHtml = `<table class="properties-table"><thead><tr><th>Property Key</th><th>Engine Value / Mechanics</th></tr></thead><tbody>`;
+                token.properties.forEach(prop => {
+                    tableHtml += `<tr><td>${escapeHtml(prop.name)}</td><td>${escapeHtml(prop.value)}</td></tr>`;
+                });
+                tableHtml += `</tbody></table>`;
+                modalPropertiesContainer.innerHTML = tableHtml;
+            } else {
+                modalPropertiesContainer.innerHTML = `<p>No specific properties declared.</p>`;
+            }
+
+            if (isVillager) {
+                modalMascotImg.src = VILLAGER_SVG;
+                modalMascotImg.alt = "Villager";
+                modalSpeakerContainer.className = "modal-speaker-container";
+                pixelBubble.className = "pixel-bubble speaker-villager";
+                modalExplanationText.textContent = token.explanation;
+                
+                villagerText.textContent = token.explanation;
+                creeperText.textContent = creeperReactions[Math.floor(Math.random() * creeperReactions.length)];
+            } else {
+                modalMascotImg.src = CREEPER_SVG;
+                modalMascotImg.alt = "Creeper";
+                modalSpeakerContainer.className = "modal-speaker-container align-right";
+                pixelBubble.className = "pixel-bubble speaker-creeper";
+                modalExplanationText.textContent = token.explanation;
+
+                creeperText.textContent = "Sssss... Pay attention to my explanation!";
+                villagerText.textContent = villagerReactions[Math.floor(Math.random() * villagerReactions.length)];
+            }
+
+            modalOverlay.classList.add('open');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('open');
+        }
+
+        function renderGrid() {
+            gridContainer.innerHTML = '';
+
+            const filteredTokens = neoforgeDatabase.filter(token => {
+                const matchesCategory = currentCategory === 'ALL' || token.category === currentCategory;
+                const matchesSearch = token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      token.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      token.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filteredTokens.length === 0) {
+                gridContainer.innerHTML = `<div class="no-results">No matching NeoForge reference topics found.</div>`;
+                return;
+            }
+
+            filteredTokens.forEach(token => {
+                const card = document.createElement('div');
+                card.className = 'token-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="token-symbol">${escapeHtml(token.symbol)}</span>
+                        <span class="token-badge ${token.category === 'ITEMS' ? 'guides' : ''}">${escapeHtml(token.category)}</span>
+                    </div>
+                    <div class="token-desc">${escapeHtml(token.desc)}</div>
+                `;
+                card.addEventListener('click', () => openModal(token));
+                gridContainer.appendChild(card);
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            renderGrid();
+        });
+
+        categoryFilters.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                document.querySelectorAll('.category-filters .duo-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                currentCategory = e.target.getAttribute('data-category');
+                renderGrid();
+            }
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('open')) {
+                closeModal();
+            }
+        });
+
+        renderGrid();
+    </script>
+</body>
+</html>
