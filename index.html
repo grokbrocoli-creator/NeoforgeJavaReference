@@ -626,7 +626,7 @@
             <img id="villagerImg" class="mascot-img" alt="Villager">
             <div class="chat-bubble villager-talk">
                 <div class="speaker">Villager Builder</div>
-                <p id="villagerText">Hrrr! Click any card below to learn how to create blocks, items, mobs, and projectiles!</p>
+                <p id="villagerText">Hrrr! Click any card below to learn how to create blocks, items, mobs, biomes, and network systems!</p>
             </div>
         </div>
         <div class="mascot-box right" id="creeperBox">
@@ -640,15 +640,15 @@
 
     <div class="controls">
         <div class="search-bar-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search NeoForge topics (e.g. 'block', 'mob', 'projectile', 'properties', 'sword')...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search NeoForge topics (e.g. 'biome', 'block entity', 'gui', 'network', 'structure')...">
         </div>
         <div class="category-filters" id="categoryFilters">
             <button class="duo-btn active" data-category="ALL">All</button>
-            <button class="duo-btn" data-category="ITEMS">Items & Tools</button>
-            <button class="duo-btn" data-category="BLOCKS">Blocks</button>
-            <button class="duo-btn" data-category="ARMOR & WEAPONS">Armor & Weapons</button>
-            <button class="duo-btn" data-category="MOBS">Mobs & Entities</button>
-            <button class="duo-btn" data-category="PROJECTILES">Projectiles</button>
+            <button class="duo-btn" data-category="BASIC MECHANICS">Basic Mechanics</button>
+            <button class="duo-btn" data-category="WORLD GEN">World Gen & Environment</button>
+            <button class="duo-btn" data-category="PLAYER MECHANICS">Player Mechanics</button>
+            <button class="duo-btn" data-category="ENTITIES & MOBS">Entities & Mobs</button>
+            <button class="duo-btn" data-category="ADVANCED SYSTEMS">Advanced Systems</button>
         </div>
     </div>
 
@@ -865,147 +865,333 @@
         `;
 
         const neoforgeDatabase = [
+            /* --- BASIC MECHANICS --- */
             {
-                symbol: "Basic Block",
-                category: "BLOCKS",
-                desc: "Registering a custom block with hardness, resistance, and sound properties.",
-                explanation: "Blocks in NeoForge represent solid physical world structures. They rely on BlockBehaviour.Properties to control physical interaction like breaking time, blast resistance, and required mining tools.",
-                detailedExplanation: "When registering a block, you define its physical attributes via Java parameters. Hardness controls how long it takes to break with a tool, blast resistance determines survival against TNT or Creeper explosions, and sound properties dictate footsteps and mining noises.",
+                symbol: "Simple Items & Tools",
+                category: "BASIC MECHANICS",
+                desc: "Basic crafting ingredients, tools, and armor with custom durability and stats.",
+                explanation: "Basic items are registered using DeferredRegister.Items. Tools extend classes like PickaxeItem or SwordItem with custom tier stats.",
+                detailedExplanation: "In NeoForge, items are registered via DeferredRegister. Tool tier definitions dictate mining tier, durability, efficiency speed, and base attack values.",
+                properties: [
+                    { name: "Registration", value: "DeferredRegister.Items" },
+                    { name: "Tool Class", value: "PickaxeItem / SwordItem" },
+                    { name: "Max Stack Size", value: "1 (Tools/Armor) or 64 (Ingredients)" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);\n<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY = ITEMS.registerSimpleItem(<span class="str">"ruby"</span>, <span class="kw">new</span> Item.Properties());`
+            },
+            {
+                symbol: "Decorative Blocks",
+                category: "BASIC MECHANICS",
+                desc: "Standard solid blocks, stairs, slabs, walls, fences, and trapdoors.",
+                explanation: "Decorative blocks standardly extend vanilla block subclasses such as StairBlock or SlabBlock using BlockBehaviour.Properties.",
+                detailedExplanation: "NeoForge uses standard Minecraft Block classes. Extending StairBlock, SlabBlock, or WallBlock gives you built-in state handling for connections and shaping.",
                 customProperties: true,
-                example: `<span class="kw">public static final</span> DeferredBlock&lt;Block&gt; RUBY_BLOCK = BLOCKS.registerBlock(<span class="str">"ruby_block"</span>,\n    properties -> <span class="kw">new</span> Block(properties),\n    BlockBehaviour.Properties.of()\n        .mapColor(MapColor.COLOR_RED)\n        .strength(<span class="kw">5.0f</span>, <span class="kw">6.0f</span>)\n        .sound(SoundType.METAL)\n        .requiresCorrectToolForDrops()\n);`
+                example: `<span class="kw">public static final</span> DeferredBlock&lt;Block&gt; RUBY_STAIRS = BLOCKS.registerBlock(<span class="str">"ruby_stairs"</span>,\n    props -> <span class="kw">new</span> StairBlock(RUBY_BLOCK.get().defaultBlockState(), props),\n    BlockBehaviour.Properties.ofFullCopy(RUBY_BLOCK.get())\n);`
             },
             {
-                symbol: "Glowing Block",
-                category: "BLOCKS",
-                desc: "Modifying block properties to emit custom light levels.",
-                explanation: "Light-emitting blocks pass a light level lambda function inside BlockBehaviour.Properties to project light values into surrounding chunks.",
-                detailedExplanation: "The .lightLevel() method accepts a function taking a BlockState parameter and returning an integer from 0 (completely dark) to 15 (brightest possible light level, identical to Glowstone or Sea Lanterns).",
+                symbol: "Functional Basic Blocks",
+                category: "BASIC MECHANICS",
+                desc: "Blocks emitting light, custom drops, or walking damage (magma/cactus).",
+                explanation: "Functional blocks override methods like stepOn() for entity damage or use lightLevel() for illumination.",
+                detailedExplanation: "You can create reactive blocks without block entities by overriding callbacks on the Block class such as stepOn(), entityInside(), or setting light parameters in properties.",
                 customProperties: true,
-                example: `<span class="kw">public static final</span> DeferredBlock&lt;Block&gt; GLOW_ORE = BLOCKS.registerBlock(<span class="str">"glow_ore"</span>,\n    properties -> <span class="kw">new</span> Block(properties),\n    BlockBehaviour.Properties.of()\n        .strength(<span class="kw">3.0f</span>)\n        .lightLevel(state -> <span class="kw">15</span>)\n);`
+                example: `<span class="kw">public class</span> HotBlock <span class="kw">extends</span> Block {\n    <span class="kw">public</span> HotBlock(Properties props) { <span class="kw">super</span>(props); }\n    <span class="anno">@Override</span>\n    <span class="kw">public void</span> stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {\n        <span class="kw">if</span> (!entity.isSteppingCarefully()) entity.hurt(level.damageSources().hotFloor(), <span class="kw">1.0f</span>);\n        <span class="kw">super</span>.stepOn(level, pos, state, entity);\n    }\n}`
             },
             {
-                symbol: "Interactive Block",
-                category: "BLOCKS",
-                desc: "A custom block class overriding useWithoutItem for right-click events.",
-                explanation: "By extending the Block class and overriding useWithoutItem, blocks can execute server-side code when a player right-clicks them.",
-                detailedExplanation: "Overriding interaction methods lets you create interactive blocks like custom crafting tables, switches, or decorative mechanisms that toggle states or display particles on right-click.",
+                symbol: "Creative Tabs & Recipes",
+                category: "BASIC MECHANICS",
+                desc: "Custom Creative inventory tabs and JSON crafting/smelting recipes.",
+                explanation: "Creative Tabs are registered via DeferredRegister.BUILD_CREATIVE_MODE_TAB. Recipes are configured via JSON files in data/modid/recipe.",
+                detailedExplanation: "Creative tabs organize your mod's items in creative mode. Recipes use data-driven JSON formats for shaped, shapeless, smelting, blasting, and campfire crafting.",
+                properties: [
+                    { name: "Tab Registry", value: "DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID)" },
+                    { name: "Recipe Path", value: "src/main/resources/data/modid/recipe/*.json" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredHolder&lt;CreativeModeTab, CreativeModeTab&gt; MOD_TAB = CREATIVE_TABS.register(<span class="str">"mod_tab"</span>,\n    () -> CreativeModeTab.builder()\n        .title(Component.translatable(<span class="str">"itemGroup.modtab"</span>))\n        .icon(() -> <span class="kw">new</span> ItemStack(RUBY.get()))\n        .displayItems((params, output) -> { output.accept(RUBY.get()); })\n        .build());`
+            },
+            {
+                symbol: "Block Entities / Tile Entities",
+                category: "BASIC MECHANICS",
+                desc: "Blocks storing dynamic data across server restarts (chests, displays, energy).",
+                explanation: "Block Entities store stateful NBT data and manage tick logic for non-static blocks.",
+                detailedExplanation: "BlockEntity (formerly TileEntity) allows blocks to store dynamic data like inventories or energy levels, saving and loading to NBT across server restarts.",
+                properties: [
+                    { name: "Registry Class", value: "BlockEntityType<T>" },
+                    { name: "Interface", value: "EntityBlock" },
+                    { name: "Data Storage", value: "NBT Tag Compounds / Save-Load overrides" }
+                ],
+                example: `<span class="kw">public class</span> CustomChestBlockEntity <span class="kw">extends</span> BlockEntity {\n    <span class="kw">public</span> CustomChestBlockEntity(BlockPos pos, BlockState state) {\n        <span class="kw">super</span>(ModBlockEntities.CUSTOM_CHEST.get(), pos, state);\n    }\n}`
+            },
+            {
+                symbol: "Interactive Machine GUIs",
+                category: "BASIC MECHANICS",
+                desc: "Custom interactive UIs with progress bars, slots, and container sync.",
+                explanation: "GUIs combine an AbstractContainerMenu on the server with a Screen class on the client to sync slot data.",
+                detailedExplanation: "Container menus handle server-side slot logic and validation, while Screen classes handle client-side rendering, button clicks, and progress bar animations.",
+                properties: [
+                    { name: "Server Logic", value: "AbstractContainerMenu" },
+                    { name: "Client UI", value: "AbstractContainerScreen<T>" },
+                    { name: "Registry", value: "MenuType<T>" }
+                ],
+                example: `<span class="kw">public class</span> MachineMenu <span class="kw">extends</span> AbstractContainerMenu {\n    <span class="kw">public</span> MachineMenu(<span class="kw">int</span> containerId, Inventory playerInv) {\n        <span class="kw">super</span>(ModMenuTypes.MACHINE_MENU.get(), containerId);\n    }\n    <span class="anno">@Override</span>\n    <span class="kw">public boolean</span> stillValid(Player player) { <span class="kw">return true</span>; }\n}`
+            },
+            {
+                symbol: "Complex Block States",
+                category: "BASIC MECHANICS",
+                desc: "Blocks changing model/behavior based on properties (facing, power, active state).",
+                explanation: "BlockState properties allow blocks to conditionally render models or change logic based on direction or active state.",
+                detailedExplanation: "Using StateDefinition.Builder, you can attach DirectionProperty or BooleanProperty to blocks (e.g. FACING, POWERED, LIT) to dynamically switch textures and bounding boxes.",
                 customProperties: true,
-                example: `<span class="kw">public class</span> InteractivePedestalBlock <span class="kw">extends</span> Block {\n    <span class="kw">public</span> InteractivePedestalBlock(Properties props) { <span class="kw">super</span>(props); }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected</span> InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {\n        <span class="kw">if</span> (!level.isClientSide()) {\n            player.sendSystemMessage(Component.literal(<span class="str">"You activated the Pedestal!"</span>));\n        }\n        <span class="kw">return</span> InteractionResult.SUCCESS;\n    }\n}`
+                example: `<span class="kw">public class</span> DirectionalFurnace <span class="kw">extends</span> Block {\n    <span class="kw">public static final</span> DirectionProperty FACING = HorizontalDirectionalBlock.FACING;\n    <span class="kw">protected void</span> createBlockStateDefinition(StateDefinition.Builder&lt;Block, BlockState&gt; builder) {\n        builder.add(FACING);\n    }\n}`
+            },
+
+            /* --- WORLD GEN & ENVIRONMENT --- */
+            {
+                symbol: "Simple Ores",
+                category: "WORLD GEN",
+                desc: "Ores generating in specific stone types, subterranean Y-levels, and cluster sizes.",
+                explanation: "Ores generate through JSON-configured Configured Features and Placed Features registered in worldgen data.",
+                detailedExplanation: "In modern NeoForge, ore placement uses data-driven JSON files under datapacks (`worldgen/configured_feature` and `worldgen/placed_feature`) to define target blocks, veins, and Y-level distribution.",
+                properties: [
+                    { name: "Target Rule", value: "TagMatchTest / BlockMatchTest" },
+                    { name: "Placement", value: "CountPlacement, InSquarePlacement, HeightRangePlacement" }
+                ],
+                example: `// Configured in JSON under data/modid/worldgen/placed_feature/ruby_ore.json\n// Defines veins per chunk, Y min/max limits, and target replacement blocks.`
             },
             {
-                symbol: "Basic Item",
-                category: "ITEMS",
-                desc: "Registering standard crafting items with DeferredRegister.",
-                explanation: "Simple items exist as inventory components used in crafting recipes, furnace smelting, or trade transactions.",
-                detailedExplanation: "Registered with standard Item.Properties(), basic items handle stack sizes (default 64, or reduced to 16/1 for special items) and fireproof status in nether lava.",
+                symbol: "Vegetation & Trees",
+                category: "WORLD GEN",
+                desc: "Custom flowers, crops with growth stages, and tree foliage generation.",
+                explanation: "Crops extend CropBlock, while trees use TreeGrower attached to saplings generating custom feature trees.",
+                detailedExplanation: "Custom plants and crops override age properties and tick growth. Custom trees use configured feature definitions with TrunkPlacer and FoliagePlacer classes.",
                 properties: [
-                    { name: "Texture Path", value: "assets/modid/textures/item/ruby.png" },
-                    { name: "Max Stack Size", value: "64 Items" },
-                    { name: "Rarity", value: "Common (White Name)" },
-                    { name: "Fire Resistant", value: "No" },
-                    { name: "Right-Click Action", value: "None" }
+                    { name: "Crop Base", value: "CropBlock" },
+                    { name: "Tree Growth", value: "TreeGrower" }
                 ],
-                example: `<span class="kw">public static final</span> DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);\n\n<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY = ITEMS.registerSimpleItem(<span class="str">"ruby"</span>, <span class="kw">new</span> Item.Properties());`
+                example: `<span class="kw">public class</span> CustomCropBlock <span class="kw">extends</span> CropBlock {\n    <span class="kw">public</span> CustomCropBlock(Properties props) { <span class="kw">super</span>(props); }\n    <span class="anno">@Override</span>\n    <span class="kw">protected</span> ItemLike getBaseSeedId() { <span class="kw">return</span> ModItems.RUBY_SEEDS.get(); }\n}`
             },
             {
-                symbol: "Right-Click Utility Wand",
-                category: "ITEMS",
-                desc: "An item that triggers custom code and cooldowns when right-clicked.",
-                explanation: "Custom items override the use() method to execute logic on right-click, applying cooldowns to prevent spam.",
-                detailedExplanation: "When right-clicked in hand, the server checks cooldown state. If ready, it executes logic like healing, spawning particles, or casting magic, then registers a tick cooldown.",
+                symbol: "Basic NBT Structures",
+                category: "WORLD GEN",
+                desc: "Single-piece structures like ruins or wells generated from .nbt structure files.",
+                explanation: "NBT structures are created in-game with Structure Blocks and placed into the world via data features.",
+                detailedExplanation: "Single-piece structures load saved `.nbt` templates from `data/modid/structure/` and place them into the world matching biome filters.",
                 properties: [
-                    { name: "Texture Path", value: "assets/modid/textures/item/healing_wand.png" },
-                    { name: "Max Stack Size", value: "1 Item (Non-stackable)" },
-                    { name: "Cooldown", value: "2.0 Seconds (40 Ticks)" },
-                    { name: "Right-Click Action", value: "Restores 3 Hearts (6.0 Health points) to the user" }
+                    { name: "File Format", value: ".nbt structure file" },
+                    { name: "Placement Data", value: "data/modid/worldgen/structure/*.json" }
                 ],
-                example: `<span class="kw">public class</span> HealingWandItem <span class="kw">extends</span> Item {\n    <span class="kw">public</span> HealingWandItem(Properties props) { <span class="kw">super</span>(props); }\n\n    <span class="anno">@Override</span>\n    <span class="kw">public</span> InteractionResultHolder&lt;ItemStack&gt; use(Level level, Player player, InteractionHand hand) {\n        <span class="kw">if</span> (!level.isClientSide()) {\n            player.heal(<span class="kw">6.0f</span>);\n            player.getCooldowns().addCooldown(<span class="kw">this</span>, <span class="kw">40</span>);\n        }\n        <span class="kw">return</span> InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());\n    }\n}`
+                example: `// Saved via in-game Structure Block -> exported to data/modid/structure/ruins.nbt`
             },
             {
-                symbol: "Custom Sword",
-                category: "ARMOR & WEAPONS",
-                desc: "Creating melee weapons with custom attack damage and swing speed.",
-                explanation: "Weapons extend SwordItem and configure damage and attack speed through AttributeModifiers.",
-                detailedExplanation: "Sword damage calculates as Base Hand Damage (1) + Tier Base Damage + Custom Modifier. Swing speed determines attack indicator recharge rates.",
+                symbol: "Custom Biomes",
+                category: "WORLD GEN",
+                desc: "Biomes with unique fog, grass colors, ambient sounds, trees, and mob spawns.",
+                explanation: "Biomes are defined via JSON files specifying climate parameters, surface rules, foliage colors, and mob spawn costs.",
+                detailedExplanation: "NeoForge uses biome JSON files in `worldgen/biome` to configure sky/fog colors, temperature, downfalls, feature decorators, and mob spawn tables.",
                 properties: [
-                    { name: "Texture Path", value: "assets/modid/textures/item/ruby_sword.png" },
-                    { name: "Material Tier", value: "Diamond Equivalent (3.0 Mining Level)" },
-                    { name: "Attack Damage", value: "8.0 Attack Points (4 Hearts)" },
-                    { name: "Attack Speed", value: "1.6 Swings per second (-2.4f modifier)" },
-                    { name: "Durability", value: "1561 Uses" }
+                    { name: "Location", value: "data/modid/worldgen/biome/*.json" },
+                    { name: "Attributes", value: "temperature, downfall, fog_color, sky_color, grass_color" }
                 ],
-                example: `<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY_SWORD = ITEMS.register(<span class="str">"ruby_sword"</span>,\n    () -> <span class="kw">new</span> SwordItem(Tiers.DIAMOND, <span class="kw">new</span> Item.Properties().attributes(\n        SwordItem.createAttributes(Tiers.DIAMOND, <span class="kw">4</span>, <span class="kw">-2.4f</span>)\n    )));`
+                example: `// JSON configured biome file defining climate noise parameters and biome visual effects.`
             },
             {
-                symbol: "Armor Pieces",
-                category: "ARMOR & WEAPONS",
-                desc: "Registering Helmets, Chestplates, Leggings, and Boots.",
-                explanation: "Armor items use ArmorItem paired with an ArmorMaterial to calculate damage reduction values and knockback resistance.",
-                detailedExplanation: "Each piece defines equipment slots (HEAD, CHEST, LEGS, FEET). Armor points directly reduce incoming physical damage according to standard Minecraft armor formulas.",
+                symbol: "Multi-Piece Jigsaw Structures",
+                category: "WORLD GEN",
+                desc: "Complex dynamic structures like villages or dungeons using Jigsaw blocks and template pools.",
+                explanation: "Jigsaw structures build large procedural structures out of smaller connected NBT pieces.",
+                detailedExplanation: "Using template pools and jigsaw anchors, Minecraft dynamically connects multiple NBT structure pieces together to construct procedurally generated dungeons or villages.",
                 properties: [
-                    { name: "Texture Path", value: "assets/modid/textures/models/armor/ruby_layer_1.png" },
-                    { name: "Armor Defense Points", value: "+8 Armor Points" },
-                    { name: "Armor Toughness", value: "+2.0 Toughness" },
-                    { name: "Knockback Resistance", value: "0.1 (10% Reduction)" },
-                    { name: "Equipment Slot", value: "Chestplate (ArmorItem.Type.CHESTPLATE)" }
+                    { name: "Engine Mechanism", value: "Jigsaw Pattern / Template Pools" },
+                    { name: "Location", value: "data/modid/worldgen/template_pool/*.json" }
                 ],
-                example: `<span class="kw">public static final</span> DeferredItem&lt;Item&gt; RUBY_CHESTPLATE = ITEMS.register(<span class="str">"ruby_chestplate"</span>,\n    () -> <span class="kw">new</span> ArmorItem(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE, <span class="kw">new</span> Item.Properties()));`
+                example: `// Managed via Template Pool JSON arrays pointing to linked Jigsaw structure pieces.`
             },
             {
-                symbol: "Custom Mob Entity",
-                category: "MOBS",
-                desc: "Creating hostile or passive mob entities with AI goals.",
-                explanation: "Mobs extend Monster or PathfinderMob, overriding registerGoals() to build custom AI behavioral trees.",
-                detailedExplanation: "Goal Selectors manage dynamic behavior priorities: priority 1 manages floating/swimming, priority 2 melee combat targeting, and higher priorities control roaming or idle animations.",
+                symbol: "Custom Dimension",
+                category: "WORLD GEN",
+                desc: "Creating custom dimensions with unique sky visuals, biomes, and portals.",
+                explanation: "Dimensions require a Stem, Dimension Type, and Noise Generator defined via data files.",
+                detailedExplanation: "Dimensions are created through JSON configurations in `dimension` and `dimension_type`. Portals can be scripted using custom block logic or NeoForge teleporter helpers.",
                 properties: [
-                    { name: "Entity Model", value: "assets/modid/geo/custom_monster.geo.json" },
-                    { name: "Entity Type", value: "Hostile Monster (MobCategory.MONSTER)" },
-                    { name: "Behavior Goals", value: "Swimming, Melee Attack, Target Players" },
-                    { name: "Hitbox Dimensions", value: "0.6 Width x 1.9 Height" }
+                    { name: "Type Data", value: "data/modid/dimension_type/*.json" },
+                    { name: "Dimension Data", value: "data/modid/dimension/*.json" }
                 ],
-                example: `<span class="kw">public class</span> CustomMonster <span class="kw">extends</span> Monster {\n    <span class="kw">public</span> CustomMonster(EntityType&lt;? <span class="kw">extends</span> Monster&gt; type, Level level) {\n        <span class="kw">super</span>(type, level);\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected void</span> registerGoals() {\n        <span class="kw">this</span>.goalSelector.addGoal(<span class="kw">1</span>, <span class="kw">new</span> FloatGoal(<span class="kw">this</span>));\n        <span class="kw">this</span>.goalSelector.addGoal(<span class="kw">2</span>, <span class="kw">new</span> MeleeAttackGoal(<span class="kw">this</span>, <span class="kw">1.2D</span>, <span class="kw">false</span>));\n        <span class="kw">this</span>.targetSelector.addGoal(<span class="kw">1</span>, <span class="kw">new</span> NearestAttackableTargetGoal&lt;&gt;(<span class="kw">this</span>, Player.<span class="kw">class</span>, <span class="kw">true</span>));\n    }\n}`
+                example: `// Configured via JSON specifying fixed coordinate scale, ambient lighting, and NoiseGenerator settings.`
+            },
+
+            /* --- PLAYER MECHANICS & EQUIPMENT --- */
+            {
+                symbol: "Custom Foods & Consumables",
+                category: "PLAYER MECHANICS",
+                desc: "Edible items that restore hunger/nutrition and grant status effects upon consumption.",
+                explanation: "Food items use FoodProperties attached to Item.Properties to give hunger points and potion effects.",
+                detailedExplanation: "By providing a FoodProperties object to an item's properties, you can set nutrition, saturation, fast-eating properties, and probability of granting active status effects.",
+                properties: [
+                    { name: "Nutrition", value: "Integer (Hunger shanks restored)" },
+                    { name: "Saturation", value: "Float (Saturation modifier)" },
+                    { name: "Effect Chance", value: "MobEffectInstance + Probability float" }
+                ],
+                example: `<span class="kw">public static final</span> FoodProperties RUBY_APPLE_FOOD = <span class="kw">new</span> FoodProperties.Builder()\n    .nutrition(<span class="kw">6</span>).saturationModifier(<span class="kw">0.8f</span>)\n    .effect(() -> <span class="kw">new</span> MobEffectInstance(MobEffects.REGENERATION, <span class="kw">100</span>, <span class="kw">1</span>), <span class="kw">1.0f</span>).build();`
             },
             {
-                symbol: "Mob Attributes",
-                category: "MOBS",
-                desc: "Setting max health, movement speed, and attack damage for mobs.",
-                explanation: "Attributes set base stats like total hit points, movement pace, and hit damage using the EntityAttributeCreationEvent event bus.",
-                detailedExplanation: "Without registered attributes, mob entities will crash upon spawning. MAX_HEALTH determines maximum health points, while ATTACK_DAMAGE sets unarmored melee strike power.",
+                symbol: "Curios & Wearable Accessories",
+                category: "PLAYER MECHANICS",
+                desc: "Items worn in secondary accessory slots granting passive stat buffs.",
+                explanation: "Accessories integrate with slot frameworks (like Curios API) to attach stats without taking armor slots.",
+                detailedExplanation: "Using accessory APIs like Curios, modders can add custom equipment slots (rings, necklaces, capes) that apply custom attribute modifiers or passive abilities.",
                 properties: [
-                    { name: "Max Health", value: "40.0 Points (20 Hearts)" },
-                    { name: "Movement Speed", value: "0.25 (Standard Zombie Speed)" },
-                    { name: "Attack Damage", value: "6.0 Points (3 Hearts per hit)" },
-                    { name: "Follow Range", value: "32.0 Blocks" }
+                    { name: "API Integration", value: "Curios API / Custom Component" },
+                    { name: "Slot Types", value: "Ring, Necklace, Charm, Back, Body" }
                 ],
-                example: `<span class="anno">@SubscribeEvent</span>\n<span class="kw">public static void</span> registerAttributes(EntityAttributeCreationEvent event) {\n    event.put(ModEntities.CUSTOM_MONSTER.get(), Monster.createMonsterAttributes()\n        .add(Attributes.MAX_HEALTH, <span class="kw">40.0D</span>)\n        .add(Attributes.MOVEMENT_SPEED, <span class="kw">0.25D</span>)\n        .add(Attributes.ATTACK_DAMAGE, <span class="kw">6.0D</span>)\n        .build());\n}`
+                example: `// Example integrating with Curios API ICurio interface to apply passive movement speed buffs.`
             },
             {
-                symbol: "Throwable Projectile",
-                category: "PROJECTILES",
-                desc: "Creating custom entity projectiles with block and entity collision.",
-                explanation: "Projectiles extend ThrowableItemProjectile to handle velocity, trajectory physics, entity damage, and block impact explosions.",
-                detailedExplanation: "When colliding with entities, onHitEntity() inflicts custom damage. Upon hitting blocks, onHitBlock() triggers server-side explosions or tile modifications before discarding the entity.",
+                symbol: "Ranged & Chargeable Weapons",
+                category: "PLAYER MECHANICS",
+                desc: "Bows, crossbows, guns, or wands consuming ammo and firing custom projectiles.",
+                explanation: "Ranged weapons extend BowItem or Custom Item, checking inventory ammo and spawning entities on release.",
+                detailedExplanation: "By overriding releaseUsing() and getUseDuration(), you can calculate draw charges and launch custom ThrowableItemProjectile or AbstractArrow entities into the world.",
                 properties: [
-                    { name: "Render Item", value: "Items.FIRE_CHARGE" },
-                    { name: "Entity Damage", value: "8.0 Direct Hit Points (4 Hearts)" },
-                    { name: "Block Collision", value: "Creates Explosion (Radius: 2.0, Cause: MOB)" },
-                    { name: "Gravity Influence", value: "Standard Throwable Arc Physics" }
+                    { name: "Base Class", value: "BowItem / Custom Item" },
+                    { name: "Use Anim", value: "UseAnim.BOW / UseAnim.SPEAR" }
                 ],
-                example: `<span class="kw">public class</span> MagicFireballEntity <span class="kw">extends</span> ThrowableItemProjectile {\n    <span class="kw">public</span> MagicFireballEntity(EntityType&lt;? <span class="kw">extends</span> ThrowableItemProjectile&gt; type, Level level) {\n        <span class="kw">super</span>(type, level);\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected void</span> onHitEntity(EntityHitResult result) {\n        <span class="kw">super</span>.onHitEntity(result);\n        result.getEntity().hurt(<span class="kw">this</span>.damageSources().thrown(<span class="kw">this</span>, <span class="kw">this</span>.getOwner()), <span class="kw">8.0f</span>);\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected void</span> onHitBlock(BlockHitResult result) {\n        <span class="kw">super</span>.onHitBlock(result);\n        <span class="kw">if</span> (!<span class="kw">this</span>.level().isClientSide()) {\n            <span class="kw">this</span>.level().explode(<span class="kw">this</span>, <span class="kw">this</span>.getX(), <span class="kw">this</span>.getY(), <span class="kw">this</span>.getZ(), <span class="kw">2.0f</span>, Level.ExplosionInteraction.MOB);\n            <span class="kw">this</span>.discard();\n        }\n    }\n\n    <span class="anno">@Override</span>\n    <span class="kw">protected</span> Item getDefaultItem() { <span class="kw">return</span> Items.FIRE_CHARGE; }\n}`
+                example: `<span class="kw">public class</span> CustomBow <span class="kw">extends</span> BowItem {\n    <span class="kw">public</span> CustomBow(Properties props) { <span class="kw">super</span>(props); }\n}`
             },
             {
-                symbol: "Spawning Projectiles",
-                category: "PROJECTILES",
-                desc: "Calculating direction and launching projectiles from a player.",
-                explanation: "Launching projectiles involves constructing entity instances server-side and calling shootFromRotation() with velocity and inaccuracy offsets.",
-                detailedExplanation: "To prevent visual desync, projectile instantiation occurs purely on the server side (!level.isClientSide()). Velocity vectors are calculated directly from player pitch and yaw angles.",
+                symbol: "Special Ability Tools & Armor",
+                category: "PLAYER MECHANICS",
+                desc: "3x3 Mining tools, AoE weapons, and full-set armor bonuses (flight/immunity).",
+                explanation: "Special tools/armor override event handlers or tick methods to check set conditions or break block grids.",
+                detailedExplanation: "Full-set armor bonuses check player equipment every tick in `onArmorTick()`. Tools implement custom `mineBlock()` logic or handle `BlockEvent.BreakEvent` to break 3x3 areas.",
                 properties: [
-                    { name: "Spawn Position", value: "Player Eye Level (eyeY - 0.1)" },
-                    { name: "Velocity Factor", value: "1.5 (Initial Flight Speed)" },
-                    { name: "Inaccuracy Multiplier", value: "1.0 (Standard Arc Spread)" },
-                    { name: "Side Constraint", value: "Server-Side Only Execution" }
+                    { name: "Armor Tick", value: "onArmorTick(ItemStack stack, Level level, Player player)" },
+                    { name: "Mining AoE", value: "BlockEvent.BreakEvent / Custom Mine logic" }
                 ],
-                example: `<span class="kw">if</span> (!level.isClientSide()) {\n    MagicFireballEntity spell = <span class="kw">new</span> MagicFireballEntity(ModEntities.MAGIC_FIREBALL.get(), level);\n    spell.setOwner(player);\n    spell.setPos(player.getX(), player.getEyeY() - <span class="kw">0.1</span>, player.getZ());\n    spell.shootFromRotation(player, player.getXRot(), player.getYRot(), <span class="kw">0.0F</span>, <span class="kw">1.5F</span>, <span class="kw">1.0F</span>);\n    level.addFreshEntity(spell);\n}`
+                example: `<span class="kw">public class</span> FireArmorItem <span class="kw">extends</span> ArmorItem {\n    <span class="kw">public</span> FireArmorItem(Type type, Properties props) { <span class="kw">super</span>(ArmorMaterials.DIAMOND, type, props); }\n    <span class="anno">@Override</span>\n    <span class="kw">public void</span> onArmorTick(ItemStack stack, Level level, Player player) {\n        <span class="kw">if</span> (player.hasFullArmorSet()) player.addEffect(<span class="kw">new</span> MobEffectInstance(MobEffects.FIRE_RESISTANCE, <span class="kw">20</span>));\n    }\n}`
+            },
+            {
+                symbol: "Custom Status Effects & Enchantments",
+                category: "PLAYER MECHANICS",
+                desc: "Creating new potion status effects with tick logic and weapon enchantments.",
+                explanation: "Status effects extend MobEffect while enchantments are registered through standard Registry systems.",
+                detailedExplanation: "MobEffect classes override `applyEffectTick()` to periodically hurt, heal, or alter entity stats. Enchantments define valid targets and enchantment tiers.",
+                properties: [
+                    { name: "Status Class", value: "MobEffect" },
+                    { name: "Enchantment Class", value: "Enchantment" }
+                ],
+                example: `<span class="kw">public class</span> FreezeEffect <span class="kw">extends</span> MobEffect {\n    <span class="kw">public</span> FreezeEffect() { <span class="kw">super</span>(MobEffectCategory.HARMFUL, <span class="kw">0x99FFFF</span>); }\n    <span class="anno">@Override</span>\n    <span class="kw">public boolean</span> applyEffectTick(LivingEntity entity, <span class="kw">int</span> amplifier) {\n        entity.setTicksFrozen(entity.getTicksFrozen() + <span class="kw">10</span>);\n        <span class="kw">return true</span>;\n    }\n}`
+            },
+
+            /* --- ENTITIES & MOBS --- */
+            {
+                symbol: "Basic Passive/Hostile Mobs",
+                category: "ENTITIES & MOBS",
+                desc: "Reskinned or stat-modified entities utilizing vanilla AI behavior goals.",
+                explanation: "Simple mobs extend PathfinderMob or Monster and register standard goals like WaterAvoidingRandomStrollGoal.",
+                detailedExplanation: "By extending existing Mob classes, you can rapidly build new creatures that reuse vanilla pathfinding, targeting, and wander goals.",
+                properties: [
+                    { name: "Base Entity", value: "Monster / Animal / PathfinderMob" },
+                    { name: "AI Mechanism", value: "GoalSelector" }
+                ],
+                example: `<span class="kw">public class</span> SimpleZombie <span class="kw">extends</span> Monster {\n    <span class="kw">public</span> SimpleZombie(EntityType&lt;? <span class="kw">extends</span> Monster&gt; type, Level level) { <span class="kw">super</span>(type, level); }\n}`
+            },
+            {
+                symbol: "Custom Loot Tables",
+                category: "ENTITIES & MOBS",
+                desc: "Defining block/mob drops using JSON files or registering custom table builders.",
+                explanation: "Loot tables determine what items, quantities, and probabilities drop when entities die or blocks break.",
+                detailedExplanation: "Configured via JSON under `data/modid/loot_tables/`, loot tables support random roll conditions, fortune enchantment bonuses, and loot pools.",
+                properties: [
+                    { name: "Path", value: "data/modid/loot_tables/blocks or entities" },
+                    { name: "Conditions", value: "LootItemRandomChanceCondition, MatchTool" }
+                ],
+                example: `// JSON configuration under data/modid/loot_tables/entities/custom_mob.json`
+            },
+            {
+                symbol: "Custom Mob AI Goals",
+                category: "ENTITIES & MOBS",
+                desc: "Writing unique AI behavior tasks (e.g. mobs protecting blocks or casting spells).",
+                explanation: "Custom AI tasks extend Goal and implement methods like canUse(), start(), and tick().",
+                detailedExplanation: "The Goal class gives full control over mob decisions. You can check conditions every tick, control entity movement, and trigger custom attacks.",
+                properties: [
+                    { name: "Base Class", value: "Goal" },
+                    { name: "Key Overrides", value: "canUse(), canContinueToUse(), start(), tick(), stop()" }
+                ],
+                example: `<span class="kw">public class</span> HealOwnerGoal <span class="kw">extends</span> Goal {\n    <span class="kw">private final</span> TamableAnimal mob;\n    <span class="kw">public</span> HealOwnerGoal(TamableAnimal mob) { <span class="kw">this</span>.mob = mob; }\n    <span class="anno">@Override</span>\n    <span class="kw">public boolean</span> canUse() { <span class="kw">return</span> mob.getOwner() != <span class="kw">null</span> && mob.getOwner().getHealth() < <span class="kw">10.0f</span>; }\n}`
+            },
+            {
+                symbol: "Tamable Pets & Mounts",
+                category: "ENTITIES & MOBS",
+                desc: "Mobs that can be tamed, commanded to sit/follow, ridden, or equipped.",
+                explanation: "Tameable mobs extend TamableAnimal and manage owner UUIDs and sit states.",
+                detailedExplanation: "Extending TamableAnimal adds tamed data trackers, sitting goals (`SitWhenOrderedToGoal`), follow goals (`FollowOwnerGoal`), and riding interactions.",
+                properties: [
+                    { name: "Base Class", value: "TamableAnimal" },
+                    { name: "Data Sync", value: "Owner UUID DataParameter" }
+                ],
+                example: `<span class="kw">public class</span> CustomPet <span class="kw">extends</span> TamableAnimal {\n    <span class="kw">public</span> CustomPet(EntityType&lt;? <span class="kw">extends</span> TamableAnimal&gt; type, Level level) { <span class="kw">super</span>(type, level); }\n}`
+            },
+            {
+                symbol: "Custom Bosses & Animations",
+                category: "ENTITIES & MOBS",
+                desc: "Multi-phase bosses with boss health bars, special phase transitions, and smooth animations.",
+                explanation: "Bosses use ServerBossEvent to display custom boss bars and libraries like GeckoLib for dynamic mesh animations.",
+                detailedExplanation: "ServerBossEvent synchronizes a top-screen health bar. Libraries like GeckoLib or AzureLib allow loading `.geo.json` models and playing keyframe skeletal animations.",
+                properties: [
+                    { name: "Boss Bar", value: "ServerBossEvent" },
+                    { name: "Animation Lib", value: "GeckoLib / AzureLib / Custom Model" }
+                ],
+                example: `<span class="kw">private final</span> ServerBossEvent bossEvent = <span class="kw">new</span> ServerBossEvent(Component.literal(<span class="str">"Dragon Boss"</span>), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);`
+            },
+
+            /* --- ADVANCED SYSTEMS --- */
+            {
+                symbol: "Sound Effects & Particles",
+                category: "ADVANCED SYSTEMS",
+                desc: "Registering custom .ogg sound files and spawning custom particle effects.",
+                explanation: "Sounds are registered via SoundEvent and declared in sounds.json. Particles extend ParticleOptions.",
+                detailedExplanation: "Registering SoundEvent allows playing custom `.ogg` audio files registered in `assets/modid/sounds.json`. Custom particles define client-side rendering textures and physics movement.",
+                properties: [
+                    { name: "Sound Path", value: "assets/modid/sounds.json" },
+                    { name: "Particle Class", value: "Particle / TextureSheetParticle" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredRegister&lt;SoundEvent&gt; SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MOD_ID);\n<span class="kw">public static final</span> DeferredHolder&lt;SoundEvent, SoundEvent&gt; SPELL_CAST = SOUNDS.register(<span class="str">"spell_cast"</span>, () -> SoundEvent.createVariableRangeByPath(<span class="kw">new</span> ResourceLocation(MOD_ID, <span class="str">"spell_cast"</span>)));`
+            },
+            {
+                symbol: "Keybindings & Hotkeys",
+                category: "ADVANCED SYSTEMS",
+                desc: "Registering custom key bindings that execute server-side actions via packets.",
+                explanation: "KeyMappings are registered on the client and send network packets to the server when pressed.",
+                detailedExplanation: "KeyMappings catch player keyboard input on the client side. When triggered, a custom network packet is sent to the server to execute actions like dashing or opening menus.",
+                properties: [
+                    { name: "Key Object", value: "KeyMapping" },
+                    { name: "Event Bus", value: "RegisterKeyMappingsEvent" }
+                ],
+                example: `<span class="kw">public static final</span> KeyMapping DASH_KEY = <span class="kw">new</span> KeyMapping(<span class="str">"key.modid.dash"</span>, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, <span class="str">"key.categories.modid"</span>);`
+            },
+            {
+                symbol: "Network Packets & Syncing",
+                category: "ADVANCED SYSTEMS",
+                desc: "Syncing client-server data (mana bars, custom HUDs, visual effects).",
+                explanation: "NeoForge uses SimpleChannel or PayloadRegistrar to register and handle custom network packets.",
+                detailedExplanation: "Custom network payloads serialize data to a FriendlyByteBuf/RegistryFriendlyByteBuf to keep client UI and server state perfectly in sync.",
+                properties: [
+                    { name: "Payload Class", value: "CustomPacketPayload" },
+                    { name: "Registration", value: "PayloadRegistrar" }
+                ],
+                example: `<span class="kw">public record</span> SyncManaPayload(<span class="kw">int</span> mana) <span class="kw">implements</span> CustomPacketPayload {\n    <span class="kw">public static final</span> Type&lt;SyncManaPayload&gt; TYPE = <span class="kw">new</span> Type&lt;&gt;(<span class="kw">new</span> ResourceLocation(MOD_ID, <span class="str">"sync_mana"</span>));\n}`
+            },
+            {
+                symbol: "Capabilities & Components",
+                category: "ADVANCED SYSTEMS",
+                desc: "Attaching custom persistent data to players, mobs, or chunks (Mana, RPG stats).",
+                explanation: "NeoForge Capability / Data Component systems attach dynamic custom data onto existing entities or stacks.",
+                detailedExplanation: "Capabilities or Data Components allow modders to attach custom persistent values (such as Mana, Energy, leveling systems, or guild claims) directly onto players, items, or chunks.",
+                properties: [
+                    { name: "Data Attachments", value: "AttachmentType<T>" },
+                    { name: "Persistence", value: "INBTSerializable / Codec" }
+                ],
+                example: `<span class="kw">public static final</span> DeferredHolder&lt;AttachmentType&lt;?&gt;, AttachmentType&lt;Integer&gt;&gt; MANA = ATTACHMENT_TYPES.register(<span class="str">"mana"</span>,\n    () -> AttachmentType.builder(() -> <span class="kw">100</span>).serialize(<span class="kw">Codec</span>.INT).build());`
             }
         ];
 
@@ -1084,7 +1270,7 @@
                 pixelBubble.className = "pixel-bubble speaker-creeper";
                 modalExplanationText.textContent = token.explanation;
 
-                creeperText.textContent = "Sssss... Pay attention to my explanation!";
+                creeperText.textContent = token.explanation;
                 villagerText.textContent = villagerReactions[Math.floor(Math.random() * villagerReactions.length)];
             }
 
@@ -1117,7 +1303,7 @@
                 card.innerHTML = `
                     <div class="card-header">
                         <span class="token-symbol">${escapeHtml(token.symbol)}</span>
-                        <span class="token-badge ${token.category === 'ITEMS' ? 'guides' : ''}">${escapeHtml(token.category)}</span>
+                        <span class="token-badge ${token.category === 'BASIC MECHANICS' ? 'guides' : ''}">${escapeHtml(token.category)}</span>
                     </div>
                     <div class="token-desc">${escapeHtml(token.desc)}</div>
                 `;
